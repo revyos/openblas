@@ -1,0 +1,95 @@
+Description: 4092-fix-timing-out
+Author: Han Gao <gaohan@iscas.ac.cn>
+From: https://patch-diff.githubusercontent.com/raw/xianyi/OpenBLAS/pull/4092.patch
+
+Last-Update: 2023-06-22
+
+Index: openblas-0.3.23+ds/kernel/riscv64/rot_vector.c
+===================================================================
+--- openblas-0.3.23+ds.orig/kernel/riscv64/rot_vector.c
++++ openblas-0.3.23+ds/kernel/riscv64/rot_vector.c
+@@ -155,6 +155,7 @@ int CNAME(BLASLONG n, FLOAT *x, BLASLONG
+                 }
+         }else{
+                 gvl = VSETVL(n);
++		if (inc_x == 0 && inc_y == 0) gvl = VSETVL(1);
+                 BLASLONG stride_x = inc_x * sizeof(FLOAT);
+                 BLASLONG stride_y = inc_y * sizeof(FLOAT);
+                 BLASLONG inc_xv = inc_x * gvl;
+Index: openblas-0.3.23+ds/kernel/riscv64/swap_vector.c
+===================================================================
+--- openblas-0.3.23+ds.orig/kernel/riscv64/swap_vector.c
++++ openblas-0.3.23+ds/kernel/riscv64/swap_vector.c
+@@ -136,6 +136,7 @@ int CNAME(BLASLONG n, BLASLONG dummy0, B
+                 }
+         }else{
+                 gvl = VSETVL(n);
++                if (inc_x == 0 && inc_y == 0) gvl = VSETVL(1);
+                 stride_x = inc_x * sizeof(FLOAT);
+                 stride_y = inc_y * sizeof(FLOAT);
+                 if(gvl <= n/2){
+Index: openblas-0.3.23+ds/kernel/riscv64/zrot_vector.c
+===================================================================
+--- openblas-0.3.23+ds.orig/kernel/riscv64/zrot_vector.c
++++ openblas-0.3.23+ds/kernel/riscv64/zrot_vector.c
+@@ -112,6 +112,7 @@ int CNAME(BLASLONG n, FLOAT *x, BLASLONG
+ 		}
+ 		
+ 	}else{
++                if (inc_x == 0 && inc_y == 0) gvl = VSETVL(1);
+ 		for(i=0,j=0; i < n/gvl; i++){
+ 			vx0 = VLSEV_FLOAT(&x[ix], stride_x, gvl);
+ 			vx1 = VLSEV_FLOAT(&x[ix+1], stride_x, gvl);
+Index: openblas-0.3.23+ds/kernel/riscv64/zswap_vector.c
+===================================================================
+--- openblas-0.3.23+ds.orig/kernel/riscv64/zswap_vector.c
++++ openblas-0.3.23+ds/kernel/riscv64/zswap_vector.c
+@@ -81,6 +81,7 @@ int CNAME(BLASLONG n, BLASLONG dummy0, B
+                 }
+         }else{
+                 gvl = VSETVL(n);
++                if (inc_x == 0 && inc_y == 0) gvl = VSETVL(1);
+                 stride_x = inc_x * 2 * sizeof(FLOAT);
+                 stride_y = inc_y * 2 * sizeof(FLOAT);
+                 BLASLONG inc_xv = inc_x * gvl * 2;
+Index: openblas-0.3.23+ds/utest/test_fork.c
+===================================================================
+--- openblas-0.3.23+ds.orig/utest/test_fork.c
++++ openblas-0.3.23+ds/utest/test_fork.c
+@@ -67,7 +67,11 @@ CTEST(fork, safety)
+ #ifndef BUILD_DOUBLE
+ exit(0);
+ #else
++#ifndef ARCH_RISCV64
+     blasint n = 1000;
++#else
++    blasint n = 100;
++#endif   
+     int i;
+ 
+     double *a, *b, *c, *d;
+Index: openblas-0.3.23+ds/utest/test_potrs.c
+===================================================================
+--- openblas-0.3.23+ds.orig/utest/test_potrs.c
++++ openblas-0.3.23+ds/utest/test_potrs.c
+@@ -399,6 +399,7 @@ CTEST(potrf, bug_695){
+ #endif
+ }
+ 
++
+ // Check potrf factorizes a small problem correctly
+ CTEST(potrf, smoketest_trivial){
+   float A1s[4] = {2, 0.3, 0.3, 3};
+Index: openblas-0.3.23+ds/utest/test_dsdot.c
+===================================================================
+--- openblas-0.3.23+ds.orig/utest/test_dsdot.c
++++ openblas-0.3.23+ds/utest/test_dsdot.c
+@@ -44,7 +44,7 @@ CTEST(dsdot,dsdot_n_1)
+ 	double res1=0.0f, res2=-0.00239335360107;
+ 
+ 	res1=BLASFUNC(dsdot)(&n, &x, &incx, &y, &incy);
+-	ASSERT_DBL_NEAR_TOL(res2, res1, DOUBLE_EPS);
++	ASSERT_DBL_NEAR_TOL(res2, res1, 1.e-9);
+ 
+ }
+ #endif

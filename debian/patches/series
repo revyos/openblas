@@ -4,3 +4,9 @@ no-embedded-lapack.patch
 shared-blas-lapack.patch
 matgen-symbols-not-included.patch
 combssq-deprecate.patch
+
+fix-thead-build.patch
+fix-old-library-name.patch
+fix-build-flags.patch
+#4092-fix-timing-out.patch
+4092-fix-timing-out-onepatch.patch

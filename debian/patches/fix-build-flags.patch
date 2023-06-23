@@ -1,0 +1,14 @@
+Description: Fix build flags
+Author: Han Gao <gaohan@iscas.ac.cn>
+
+Last-Update: 2023-06-19
+
+--- openblas-0.3.23+ds.orig/Makefile.riscv64
++++ openblas-0.3.23+ds/Makefile.riscv64
+@@ -1,4 +1,4 @@
+ ifeq ($(CORE), C910V)
+-CCOMMON_OPT += -march=rv64imafdcv0p7_zfh_xtheadc -mabi=lp64d -mtune=c920
+-FCOMMON_OPT += -march=rv64imafdcv0p7_zfh_xtheadc -mabi=lp64d -mtune=c920 -static
++CCOMMON_OPT += -march=rv64gcv0p7_zfh_xtheadc -mabi=lp64d -mtune=c920
++FCOMMON_OPT += -march=rv64gcv0p7_zfh_xtheadc -mabi=lp64d -mtune=c920
+ endif

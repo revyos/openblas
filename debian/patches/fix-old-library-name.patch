@@ -1,0 +1,18 @@
+Description: Compatibility with old library name
+Author: Han Gao <gaohan@iscas.ac.cn>
+
+Last-Update: 2023-06-19
+
+--- openblas-0.3.23+ds.orig/getarch.c
++++ openblas-0.3.23+ds/getarch.c
+@@ -1674,7 +1674,9 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+        "-DL1_DATA_SIZE=32768 -DL1_DATA_LINESIZE=32 " \
+        "-DL2_SIZE=1048576 -DL2_LINESIZE=32 " \
+        "-DDTB_DEFAULT_ENTRIES=128 -DDTB_SIZE=4096 -DL2_ASSOCIATIVE=4 "
+-#define LIBNAME   "c910v"
++// #define LIBNAME   "c910v"
++// Compatibility with old library name
++#define LIBNAME   "riscv64_generic"
+ #define CORENAME  "C910V"
+ #endif
+ #else

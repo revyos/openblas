@@ -44,7 +44,7 @@ TARGET_OPTION_ppc64     = TARGET=POWER4
 # We do not use DYNAMIC_ARCH selection on mips64el because it only works for
 # Loongson3R3/3R4
 TARGET_OPTION_mips64el  = TARGET=MIPS64_GENERIC
-TARGET_OPTION_riscv64   = TARGET=RISCV64_GENERIC
+TARGET_OPTION_riscv64   = TARGET=C910V
 TARGET_OPTION_sparc64   = TARGET=SPARC
 GENERIC_OPTIONS += $(TARGET_OPTION_$(DEB_HOST_ARCH))
 
@@ -57,6 +57,10 @@ else
 	export DEB_CFLAGS_MAINT_APPEND := -march=native -mtune=native
 	export DEB_FFLAGS_MAINT_APPEND := -march=native -mtune=native
 endif
+
+# -O1 for gcc
+export DEB_CFLAGS_MAINT_APPEND := -O1
+#export DEB_FFLAGS_MAINT_APPEND := -O1
 
 # Flavors: 64-bit array indexing is invalid for 32-bit machines.
 ifeq (64,$(DEB_HOST_ARCH_BITS))
